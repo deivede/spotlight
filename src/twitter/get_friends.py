@@ -7,9 +7,13 @@ class friendObject(object):
         self.link = link
         self.screen_name = screen_name
 
-def setViewStatus(user, friendId, bool):
+def setViewStatus(user, friendId):
     query = "twitter." + friendId + ".view_status"
-    db.users.find_one_and_update({"screen_name": user}, {"$set": {query: bool}})
+    boolObj = db.users.find({"screen_name": user}, {query: 1})
+
+    boolStatus = boolObj[0]["twitter"][friendId]["view_status"]
+    db.users.find_one_and_update({"screen_name": user}, {"$set": {query: not boolStatus}})
+
 
 def getTrueViewStatus(user):
     friends = db.users.find({"screen_name": user}, {"twitter": 1})
@@ -30,7 +34,5 @@ def setFriendsArray(friendsDict):
 
             addFriend = friendObject(_pic, _id, _link, _screen_name)
             friendsArray.append(addFriend.__dict__)
-
-    # print(friendsArray)
 
     return friendsArray
