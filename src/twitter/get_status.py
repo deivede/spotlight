@@ -1,6 +1,8 @@
 import tweepy
-from src.twitter.keys import *
-from src.twitter.config import *
+from src.twitter.heroku_keys import *
+from src.twitter.heroku_config import *
+# from src.twitter.keys import *
+# from src.twitter.config import *
 # from keys import *
 
 # def getFriend(user, friendId):

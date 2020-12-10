@@ -1,4 +1,5 @@
-from src.twitter.config import *
+# from src.twitter.config import *
+from src.twitter.heroku_config import *
 
 class friendObject(object):
     def __init__(self, pic, id, link, screen_name):
