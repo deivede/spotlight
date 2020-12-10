@@ -9,6 +9,7 @@
   display: block;
 } */
 
+
 #render {
   width: 100%;
   background-color: lightyellow;
@@ -30,6 +31,14 @@
   background-color: SandyBrown;
   display: inline-block;
 } */
+
+#timeline {
+  overflow: scroll;
+  margin: 0 auto;
+  width: 600px;
+  height: 800px;
+}
+
 
 .displayBox {
   height: 90px;
