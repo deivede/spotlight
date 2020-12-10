@@ -10,6 +10,19 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+@app.route("/config", methods=["GET"])
+def config():
+    friends = getTrueViewStatus("deivede")
+    return render_template('config.html', friends=friends)
+
+@app.route("/config", methods=["POST"])
+def form():
+    formReq = request.form.to_dict()
+    for id in formReq:
+        setViewStatus("deivede", id)
+
+    friends = getTrueViewStatus("deivede")
+    return redirect("/config")
 
 @app.route("/", methods=["POST"])
 def update():
