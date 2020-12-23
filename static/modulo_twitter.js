@@ -13,40 +13,57 @@ async function getTweets() {
             super(props);
             this.state = {
               new_tweets: 0,
-              remove_border: "",
               set_opacity: 0.3,
               set_visibility: "visible",
               list: [],
-              value: ''
+              value: '',
+              unreadTweets: 0,
+              new_tweets_diff: 0,
+              pic_border: "Gainsboro",
+              decrease_user: true
             }
-            this.reqTweets = this.reqTweets.bind(this);
+            this.requestTweets = this.requestTweets.bind(this);
             this.removeBorder = this.removeBorder.bind(this);
             this.renderTweetsList = this.renderTweetsList.bind(this);
         }
 
         removeBorder() {
-         this.setState({remove_border: "0px"});
-       }
+          if(this.state.decrease_user === false){
+            this.props.decreaseTotalUsers();
+            this.setState({decrease_user: true})
+          }
+          this.setState({pic_border: "Gainsboro"});
+        }
 
-        reqTweets() {
-            const friendId = this.props.id;
+        requestTweets() {
+
+
+            const friendScreenName = this.props.screen_name
+            const friendId = this.props.id
 
             const setTweetsState = (response) => {
                 {
                     if (response.ok) {
                         response.json()
                         .then( friend => {
-                            var newTweet = friend.new_tweet;
-                            var newList = friend.tweets_array;
+                            const newTweet = friend.new_tweet;
+                            const newList = friend.tweets_array;
                             console.log(newTweet, newList);
 
+                            this.setState({unreadTweets: newTweet});
                             this.setState({new_tweets: this.state.new_tweets + newTweet});
+                            this.props.incrementTotalTweets(this.state.unreadTweets);
+                            if(newTweet > 0 && this.state.decrease_user === true) {
+                              this.props.incrementTotalUsers();
+                              this.setState({decrease_user: false})
+                            }
+
                             if(newList.length > 0) {
-                                for(var i=0 ; i<newList.length ; i++) {
+                                for(let i=0 ; i<newList.length ; i++) {
                                     this.setState({value: newList[i]});
                                     console.log(this.state.value)
                                     this.setState(state => {
-                                    var list = [state.value].concat(state.list);
+                                    const list = [state.value].concat(state.list);
                                     return {
                                         list,
                                         value: '',
@@ -54,12 +71,11 @@ async function getTweets() {
                                   });
                                   console.log(this.state.list)
                                 }
-
                             }
                          })
                   }
                   else {
-                        console.log("No new tweets from" + friendId);
+                        console.log("No new tweets from" + friendScreenName);
                     }
                 }
             }
@@ -76,69 +92,65 @@ async function getTweets() {
                   return setTweetsState(tweetsData);
             }
 
+
            fetchNewTweets();
         }
 
         renderTweetsList() {
-          const div = ['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20']
-
-          document.getElementById("0").innerHTML = "";
-          document.getElementById("1").innerHTML = "";
-          document.getElementById("2").innerHTML = "";
-          document.getElementById("3").innerHTML = "";
-          document.getElementById("4").innerHTML = "";
-          document.getElementById("5").innerHTML = "";
-          document.getElementById("6").innerHTML = "";
-          document.getElementById("7").innerHTML = "";
-          document.getElementById("8").innerHTML = "";
-          document.getElementById("9").innerHTML = "";
-          document.getElementById("10").innerHTML = "";
-          document.getElementById("11").innerHTML = "";
-          document.getElementById("12").innerHTML = "";
-          document.getElementById("13").innerHTML = "";
-          document.getElementById("14").innerHTML = "";
-          document.getElementById("15").innerHTML = "";
-          document.getElementById("16").innerHTML = "";
-          document.getElementById("17").innerHTML = "";
-          document.getElementById("18").innerHTML = "";
-          document.getElementById("19").innerHTML = "";
+          const timeline = document.getElementById("timeline");
+          timeline.innerHTML = "";
 
           const tweetsList = this.state.list;
+          for(let i=1; i <= tweetsList.length ; i++){
+              const newDiv = document.createElement("div");
+              newDiv.setAttribute("id", i)
+              newDiv.innerHTML = "";
+              document.getElementById("timeline").appendChild(newDiv);
+           }
 
-          if(tweetsList.length <= 20) {
-            for(let i=0; i<=tweetsList.length ; i++) {
-               twttr.widgets.createTweet(
-                 tweetsList[i],
-                 document.getElementById(div[i])
-               );
-            }
-        } else if(tweetsList.length > 20) {
-            for(let i=0; i<=19 ; i++) {
-               twttr.widgets.createTweet(
-                 tweetsList[i],
-                 document.getElementById(div[i])
-               );
-            }
-          }
-          console.log(tweetsList);
+          for(let i=0; i < this.state.unreadTweets ; i++) {
+              twttr.widgets.createTweet(
+                   tweetsList[i],
+                   document.getElementById(parseInt(i+1)),
+                 );
+           }
+
+           const unreadTweets = this.state.unreadTweets
+
+           function renderUnreadTweets(){
+              for(let i = unreadTweets; i <= tweetsList.length ; i++) {
+                    twttr.widgets.createTweet(
+                      tweetsList[i],
+                      document.getElementById(parseInt(i))
+                    );
+                 }
+             }
+
+            const renderMoreButton = document.createElement("button");
+            renderMoreButton.addEventListener("click", renderUnreadTweets);
+            renderMoreButton.setAttribute("id", "loadButton");
+            renderMoreButton.innerHTML = "Mais Tweets";
+            document.getElementById("timeline").appendChild(renderMoreButton);
+            console.log(tweetsList);
         }
 
         componentDidMount() {
             const hideDisplay = async () => {
-              await this.reqTweets();
+              await this.requestTweets();
               if(this.state.new_tweets == 0) {
                 this.setState({set_visibility: "hidden"});
               }
             }
             hideDisplay();
-            setInterval(() => this.reqTweets(), 300000);
+            setInterval(() => this.requestTweets(), 300000);
         }
 
         componentDidUpdate(prevProps, prevState) {
           if(this.state.new_tweets !== prevState.new_tweets) {
-              this.setState({remove_border: "3px solid red"});
+              this.setState({pic_border: "red"});
               this.setState({set_opacity: 1});
               this.setState({set_visibility: "visible"});
+              this.setState({new_tweets_diff: this.state.new_tweets - prevState.newTweets});
           }
         }
 
@@ -146,14 +158,14 @@ async function getTweets() {
             return (
               <div className="displayWrapper">
                 <div className="displayBox">
-                  <div>
+                  <div className="story" style={{borderColor: this.state.pic_border}}>
                     <img src={this.props.pic}  className="PicClip"
-                    onClick={() => {this.renderTweetsList(); this.removeBorder()}}
+                    onClick={() => {this.renderTweetsList(); this.removeBorder(); this.props.decreaseTotalTweets(this.state.unreadTweets);}}
                     style={{opacity: this.state.set_opacity}}/>
-                  </div>
-                  <div className="newTweetsDisplay" style={{border: this.state.remove_border, visibility: this.state.set_visibility}}>
-                    <div className="numberDisplay">
-                    {this.state.new_tweets}
+                    <div className="newTweetsDisplay" style={{border: this.state.remove_border, visibility: this.state.set_visibility}}>
+                      <div className="numberDisplay">
+                      {this.state.new_tweets}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -162,16 +174,81 @@ async function getTweets() {
         }
     }
 
-    class RenderTweets extends React.Component {
-                  render() {
-                    var displayTwitterArray = []
-                    displayTwitterArray = friendsArray.map(friendProps => (<DisplayTwitter key={friendProps.id} pic={friendProps.pic[0]} id={friendProps.id} />));
-                    return displayTwitterArray
-                  }
-              }
+
+
+    class TwitterDashboard extends React.Component {
+        constructor(props) {
+          super(props);
+            this.state = {
+                totalTweets: 0,
+                totalUsers: 0,
+                id: 1
+            }
+          this.incrementTotalTweets = this.incrementTotalTweets.bind(this);
+          this.decreaseTotalTweets = this.decreaseTotalTweets.bind(this);
+          this.incrementTotalUsers = this.incrementTotalUsers.bind(this);
+          this.decreaseTotalUsers = this.decreaseTotalUsers.bind(this);
+          this.resetState = this.resetState.bind(this);
+          }
+
+        incrementTotalTweets(update) {
+          if(this.state.totalTweets >= 0) {
+            this.setState({totalTweets: this.state.totalTweets + update});
+          }
+        }
+
+        decreaseTotalTweets(update) {
+          if(this.state.totalTweets > 0) {
+          this.setState({totalTweets: this.state.totalTweets - update});
+          }
+        }
+
+        incrementTotalUsers() {
+          if(this.state.totalUsers >= 0){
+          this.setState({totalUsers: this.state.totalUsers + 1});
+          }
+        }
+
+        decreaseTotalUsers() {
+          if(this.state.totalUsers > 0) {
+          this.setState({totalUsers: this.state.totalUsers - 1});
+          }
+        }
+
+        resetState() {
+          this.setState({
+            totalTweets: 0,
+            totalUsers: 0
+          });
+         }
+
+        remountDisplays() {
+          this.setState({id: this.state.id * 23 })
+        }
+
+         render() {
+           var userDisplays = []
+           userDisplays = friendsArray.map(friendProps => (<DisplayTwitter key={this.state.id + friendProps.index} key_id={this.state.id + friendProps.index}
+             screen_name={friendProps.screen_name[0]} pic={friendProps.pic[0]} id={friendProps.id} incrementTotalTweets={this.incrementTotalTweets}
+             decreaseTotalTweets={this.decreaseTotalTweets} incrementTotalUsers={this.incrementTotalUsers} decreaseTotalUsers={this.decreaseTotalUsers} />));
+           userDisplays.unshift(<button className="resetDashboard" onClick={() => {this.remountDisplays(); this.resetState();}}>Reset</button>)
+            return (
+              <div>
+                <div>
+                  <button className="dashboard" ><span href="#" className="fa fa-twitter"></span> <span className="dashboardDisplay">{this.state.totalTweets}
+                  </span><span className="dashboardDisplay users">{this.state.totalUsers}</span>
+                  </button>
+                </div>
+                <div >
+                  {userDisplays}
+                </div>
+              </div>
+            )
+          }
+    }
 
     ReactDOM.render(
-                  <RenderTweets /> ,
+                  <TwitterDashboard /> ,
          document.getElementById("render")
        );
 
