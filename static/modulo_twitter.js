@@ -18,7 +18,6 @@ async function getTweets() {
               list: [],
               value: '',
               unreadTweets: 0,
-              new_tweets_diff: 0,
               pic_border: "Gainsboro",
               decrease_user: true
             }
@@ -50,7 +49,9 @@ async function getTweets() {
                             const newList = friend.tweets_array;
                             console.log(newTweet, newList);
 
-                            this.setState({unreadTweets: newTweet});
+                            if(this.state.pic_border !== "red") {
+                              this.setState({unreadTweets: newTweet});
+                            }
                             this.setState({new_tweets: this.state.new_tweets + newTweet});
                             this.props.incrementTotalTweets(this.state.unreadTweets);
                             if(newTweet > 0 && this.state.decrease_user === true) {
@@ -150,7 +151,6 @@ async function getTweets() {
               this.setState({pic_border: "red"});
               this.setState({set_opacity: 1});
               this.setState({set_visibility: "visible"});
-              this.setState({new_tweets_diff: this.state.new_tweets - prevState.newTweets});
           }
         }
 
@@ -223,7 +223,7 @@ async function getTweets() {
          }
 
         remountDisplays() {
-          this.setState({id: this.state.id * 23 })
+          this.setState({id: this.state.id * 50 })
         }
 
          render() {

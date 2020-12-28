@@ -37,6 +37,8 @@ def setTweetsJSON(newTweets):
         TweetsArray.append(newTweets[i].id_str)
 
     newTweetsLen = len(newTweets)
+    
+    TweetsArray.reverse()
 
     TweetsJSON = {
         "new_tweet": newTweetsLen,
