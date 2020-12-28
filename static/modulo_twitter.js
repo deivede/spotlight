@@ -51,6 +51,8 @@ async function getTweets() {
 
                             if(this.state.pic_border !== "red") {
                               this.setState({unreadTweets: newTweet});
+                            } else {
+                              this.setState({unreadTweets: this.state.unreadTweets + newTweet});
                             }
                             this.setState({new_tweets: this.state.new_tweets + newTweet});
                             this.props.incrementTotalTweets(this.state.unreadTweets);
