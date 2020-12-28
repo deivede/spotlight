@@ -5,14 +5,6 @@ from src.twitter.heroku_config import *
 # from src.twitter.config import *
 # from keys import *
 
-# def getFriend(user, friendId):
-#     twitter = "twitter." + friendId
-#     friendDict = db.users.find({"screen_name": user}, {twitter: 1})
-#
-#     print(friendDict[0]["twitter"][friendId])
-#
-#     return friendDict[friendId]["id_str"][0]
-
 def getNewTweets(user, friendId):
 
     twitter = "twitter." + friendId
@@ -37,7 +29,7 @@ def setTweetsJSON(newTweets):
         TweetsArray.append(newTweets[i].id_str)
 
     newTweetsLen = len(newTweets)
-    
+
     TweetsArray.reverse()
 
     TweetsJSON = {

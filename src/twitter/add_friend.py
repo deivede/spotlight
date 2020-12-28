@@ -39,8 +39,6 @@ def setFriendsDict(friendsData):
             newFriend = userObject(_id, _id_str, _name, _screen_name, _last_tweet, _profile_image_url, _url, _protected, _view_status)
             friendsList.update({ _id_str : newFriend.__dict__ })
 
-    # print(list(friendsList)[i], list(friendsList.values())[0])
-
     return friendsList
 
 def pushFriendsToDB(friends):
