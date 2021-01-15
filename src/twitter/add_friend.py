@@ -1,4 +1,3 @@
-import tweepy
 from keys import *
 from config import *
 import pymongo, tweepy

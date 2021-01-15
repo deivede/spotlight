@@ -1,38 +1,39 @@
 from keys import *
-from spotlight.config import *
+from config import *
 
-class follow_users(object):
+class userObject(object):
     def __init__(self, id, name, screen_name,  profile_image_url):
         self.id = id,
         self.name = name,
         self.screen_name = screen_name,
-        self.new_story = 0,
         self.profile_image_url = profile_image_url
 
 
-following_list = {}
+def getFollowings():
+    UUID = api.generate_uuid()
+    followingData = api.user_following(api.authenticated_user_id, rank_token=UUID)
 
-# UUID = api.generate_uuid()
-#
-# following_data = api.user_following(api.authenticated_user_id, rank_token=UUID)
+    return followingData
 
-following_data = api.user_info("4407026")
+def setFollowingsDict(followingData):
+    followingList = {}
 
-for i in range(len(following_data['user'])):
-        _id = following_data['user']['pk']
-        _name = following_data['user']['full_name']
-        _screen_name = following_data['user']['username']
-        _profile_image_url = following_data['user']['profile_pic_url']
+    for user in followingData['users']:
+        _id = user['pk']
+        _name = user['full_name']
+        _screen_name = user['username']
+        _profile_image_url = user['profile_pic_url']
 
-        following_list.update({ 'ceciliamfurlan' : ""})
+        newUser = userObject(_id, _name, _screen_name, _profile_image_url)
+        followingList.update({ _id: newUser.__dict__ })
 
-        new_user = follow_users(_id, _name, _screen_name, _profile_image_url)
-        following_list.update({ 'ceciliamfurlan': new_user.__dict__ })
+    print(followingList)
+    return followingList
 
-print(following_list)
-
-for i in range(len(following_list)):
-    str = list(following_list)[i]
-    key = 'instagram.' + str
-    values = list(following_list.values())[i]
-    db.users.find_one_and_update({'screen_name': 'Deivede73'}, {'$set': { key: values}})
+def pushFollowingToDB(followingList):
+    print(len(followingList))
+    for i in range(len(followingList)):
+        index = list(followingList)[i]
+        key = 'instagram.' + str(index)
+        values = list(followingList.values())[i]
+        db.users.find_one_and_update({'screen_name': 'deivede'}, {'$set': { key: values}})

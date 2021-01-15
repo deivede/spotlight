@@ -1,30 +1,21 @@
-from src.instagram.keys import api
-from config import db
+from src.instagram.heroku_config import *
+from src instagram.heroku_keys import *
+# from src.instagram.keys import api
+# from src.instagram.config import db
 
-def take_stry(account):
+def getActiveStories(userId):
+    storiesDict = api.user_story_feed(userId)
+    storiesItems = storiesDict["reel"]["items"]
 
-    instagram = "instagram."
+    return storiesItems
 
-    ig_conct = instagram + account
+def setStoriesJSON(storiesItems):
+    newStories = len(storiesItems)
+    lastReel = storiesItems[-1]["taken_at"]
 
-    user = db.users.find({"screen_name": "Deivede73"}, {ig_conct: 1})
-
-    last_stry = user[0]["instagram"][account]["last_story"][0]
-
-    id_account = user[0]["instagram"][account]["id"][0]
-
-    new_stry = api.user_story_feed(id_account)
-
-    stry_items = new_stry["reel"]["items"]
-
-    active_stry = len(stry_items)
-    #
-    # db_conct =  ig_conct + ".new_story.0"
-    #
-    # db.users.update_one({"screen_name": "Deivede73"}, { "$set": { db_conct: active_stry }})
-
-    new_stry_json = {
-        "new_stry": active_stry
+    storiesJSON = {
+        "new_stories": newStories,
+        "last_reel": lastReel
     }
 
-    return new_stry_json
+    return storiesJSON

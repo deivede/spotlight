@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify, make_response, redirect
 from src.twitter.get_status import getNewTweets, setTweetsJSON
 from src.twitter.get_friends import setViewStatus, getTrueViewStatus, setFriendsArray
-# from src.instagram.get_friends import getusr_ig
-# from src.instagram.get_status import take_stry
+from src.instagram.get_friends import getTrueViewStatusInstagram, setUsersArray, setViewStatusInstagram
+from src.instagram.get_status import getActiveStories, setStoriesJSON
 
 app = Flask(__name__)
 
@@ -15,6 +15,11 @@ def config():
     friends = getTrueViewStatus("deivede")
     return render_template('config.html', friends=friends)
 
+@app.route("/config/instagram", methods=["GET"])
+def configInsta():
+    users = getTrueViewStatusInstagram("deivede")
+    return render_template('config_instagram.html', users=users)
+
 @app.route("/config", methods=["POST"])
 def form():
     formReq = request.form.to_dict()
@@ -24,7 +29,16 @@ def form():
     friends = getTrueViewStatus("deivede")
     return redirect("/config")
 
-@app.route("/", methods=["POST"])
+@app.route("/config/instagram", methods=["POST"])
+def formInsta():
+    formReq = request.form.to_dict()
+    for id in formReq:
+        setViewStatusInstagram("deivede", id)
+
+    users = getTrueViewStatusInstagram("deivede")
+    return redirect("/config/instagram")
+
+@app.route("/twitter", methods=["POST"])
 def update():
 
     rawID = request.data
@@ -41,41 +55,36 @@ def update():
 @app.route("/twitterfriends", methods=["GET"])
 def data():
 
-    trueFriends = getTrueViewStatus("deivede")
-    groupFriends = setFriendsArray(trueFriends)
+    trueUsers = getTrueViewStatus("deivede")
+    groupUsers = setFriendsArray(trueUsers)
 
-    responseJSON = make_response(jsonify({"friendsArray": groupFriends}), 200)
+    responseJSON = make_response(jsonify({"friendsArray": groupUsers}), 200)
+    print(responseJSON)
+    return responseJSON
 
-    print(groupFriends)
+@app.route("/instagram", methods=["POST"])
+def updateInstagram():
+    rawID = request.data
+    userId = rawID.decode("utf-8")
+
+    storiesAPI = getActiveStories(userId)
+    storiesJSON = setStoriesJSON(storiesAPI)
+
+    responseJSON = make_response(jsonify({"new_storie": storiesJSON["new_stories"],
+                                            "last_reel": storiesJSON["last_reel"] }), 200)
 
     return responseJSON
 
-# @app.route("/ig", methods=["POST"])
-# def ig():
-#
-#     req = request.data
-#
-#     print(req)
-#
-#     usr_res = req.decode("utf-8")
-#
-#     restry = take_stry(usr_res)
-#
-#     res = make_response(jsonify({"stry": restry["new_stry"]}), 200)
-#
-#     return res
-#
-# @app.route("/dbusr_ig", methods=["GET"])
-# def usr_ig():
-#
-#
-#     ret_ig = getusr_ig()
-#
-#     resp = make_response(jsonify({"usr_ig": ret_ig}), 200)
-#
-#     print(resp)
-#
-#     return resp
+
+@app.route("/instagramusers", methods=["GET"])
+def dataInstagram():
+
+    trueUsers = getTrueViewStatusInstagram("deivede")
+    groupUsers = setUsersArray(trueUsers)
+
+    responseJSON = make_response(jsonify({"usersArray": groupUsers}), 200)
+
+    return responseJSON
 
 
 if __name__ == "__main__":

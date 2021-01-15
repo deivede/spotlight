@@ -1,71 +1,42 @@
-from config import *
+from src.instagram.heroku_config import *
+from src instagram.heroku_keys import *
+# from src.instagram.config import *
+# from config import *
 
-
-class friend_obj(object):
-    def __init__(self, pic, id, link, nwtt):
+class userObject(object):
+    def __init__(self, pic, id, screen_name, index):
         self.pic = pic
         self.id = id
-        self.link = link
-        self.nwtt = nwtt
+        self.screen_name = screen_name
+        self.index = index
 
-class account_obj(object):
-    def __init__(self, pic, id, link):
-        self.pic = pic
-        self.id = id
-        self.link = link
+def setViewStatusInstagram(user, friendId):
+    query = "instagram." + friendId + ".view_status"
+    boolObj = db.users.find({"screen_name": user}, {query: 1})
 
+    boolStatus = boolObj[0]["instagram"][friendId]["view_status"]
+    db.users.find_one_and_update({"screen_name": user}, {"$set": {query: not boolStatus}})
 
-dbusr_ig = {}
+def getTrueViewStatusInstagram(user):
+    users = db.users.find({"screen_name": user})
+    userDict = users[0]["instagram"]
 
-def get_home_accounts(account):
+    return userDict
 
-        instagram = "instagram."
+def setUsersArray(userDict):
 
-        ig_conct = instagram + account
+    usersArray = []
+    index = 1
 
-        user = db.users.find({"screen_name": "Deivede73"}, {ig_conct: 1})
+    for user in userDict:
+        if userDict[user]["view_status"] is True:
+            _id = userDict[user]["id"][0]
+            _pic = userDict[user]["profile_image_url"],
+            _screen_name = userDict[user]["screen_name"][0],
+            _index = index
+            index = index + 1
 
-        _pic = user[0]["instagram"][account]["profile_image_url"],
-        _id = user[0]["instagram"][account]["screen_name"][0],
-        _link = "http://instagram.com/stories/" + user[0]["instagram"][account]["screen_name"][0],
+            addUser = userObject(_pic, _id, _screen_name, _index)
+            usersArray.append(addUser.__dict__)
 
-        add_account = account_obj(_pic, _id, _link)
-
-        dbusr_ig.update({account: add_account.__dict__})
-
-get_home_accounts("rique_cardoso_")
-get_home_accounts("kainalacerda")
-get_home_accounts("werneck_tati")
-get_home_accounts("ca_momille")
-get_home_accounts("nath_ayres")
-get_home_accounts("larissesposito")
-get_home_accounts("cecihadassa")
-get_home_accounts("tainasoaresc")
-get_home_accounts("brunarochaamorim")
-get_home_accounts("bacanna_tattoo")
-get_home_accounts("_aninhamr_")
-get_home_accounts("anna_bacanna")
-get_home_accounts("hiimf")
-get_home_accounts("celadeoliveira")
-get_home_accounts("juu_lunardi")
-get_home_accounts("lucollyer")
-get_home_accounts("saraecheagaray")
-get_home_accounts("ceelaribeiro")
-get_home_accounts("niccsz")
-get_home_accounts("deborasecoalmeida")
-get_home_accounts("willthetraveler")
-get_home_accounts("aninha_sousa27")
-get_home_accounts("fernandasaffi")
-get_home_accounts("ofamosopachecao")
-# get_home_accounts("ceciliamfurlan")
-get_home_accounts("gabemelos")
-get_home_accounts("ruliadantas")
-# get_home_accounts("marinavascart")
-get_home_accounts("bbr_oliveira")
-# get_home_accounts("referreiratiff")
-get_home_accounts("rliaju")
-get_home_accounts("_soytha")
-
-
-def getusr_ig():
-    return dbusr_ig
+    return usersArray
