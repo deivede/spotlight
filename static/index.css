@@ -1,15 +1,30 @@
+#dashboardWrapper {
+  height: 110px;
+  width: 100%;
+}
+
+#buttonsWrapper {
+  margin: 0 auto;
+  width: 300px;
+  height: 110px;
+}
+
 .dashboard {
- width: 9%;
- height: 50px;
- border-radius: 100px;
+ width: 150px;
+ height: 110px;
+ border-radius: 50px;
  background-color: #1da1f2;
  text-align: center;
  font-weight: bold;
- font-size: 25px;
+ font-size: 20px;
  color: white;
- display: block;
+ display: inline;
  margin: auto;
  position: relative;
+}
+
+.dashboard.instagram {
+  background-color: salmon;
 }
 
 #render {
@@ -42,12 +57,6 @@
   display: inline-block;
 }
 
-/* #render_ig {
-  width: 100%;
-  background-color: SandyBrown;
-  display: inline-block;
-} */
-
 #timeline {
   overflow: scroll;
   margin: 0 auto;
@@ -62,8 +71,8 @@
 }
 
 .dashboardDisplay {
-  height: 35px;
-  width: 35px;
+  height: 30px;
+  width: 30px;
   background-color: sandybrown;
   border-radius: 50%;
   display: inline-block;
@@ -72,6 +81,14 @@
 
 .dashboardDisplay.users {
   background-color: lightskyblue;
+}
+
+.dashboardDisplay.instagram {
+  background-color: purple;
+}
+
+.dashboardDisplay.stories {
+  background-color: orange;
 }
 
 .resetDashboard {
@@ -110,4 +127,10 @@
   position: relative;
   top: 1px;
   left: 2px;
+}
+
+.PicClip.small{
+  height:20px;
+  width:20px;
+  margin: 2px;
 }
