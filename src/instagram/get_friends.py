@@ -1,5 +1,5 @@
 from src.instagram.heroku_config import *
-from src instagram.heroku_keys import *
+from src.instagram.heroku_keys import *
 # from src.instagram.config import *
 # from config import *
 
