@@ -498,7 +498,7 @@ async function getTweets() {
                                  AddPicsToDashboard={this.AddPicsToDashboard}
                                  resetUserPics={this.resetUserPics}
                 />));
-           igUserDisplays.unshift(<button className="resetDashboard" onClick={() => {this.remountDisplays(); this.resetState("instagram");}}>Reset</button>)
+           igUserDisplays.unshift(<button className="resetDashboard" onClick={() => {this.resetState("instagram");}}>Reset</button>)
 
             return (
               <div>
