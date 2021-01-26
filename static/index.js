@@ -277,7 +277,7 @@ async function getTweets() {
 
         componentDidMount() {
           this.requestStories(true);
-          setInterval(() => this.requestStories(false), 300000);
+          setInterval(() => this.requestStories(false), 315000);
         }
 
         render() {
