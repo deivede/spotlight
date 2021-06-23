@@ -103,6 +103,7 @@ async function getTweets() {
         }
 
         renderTweetsList() {
+          console.log(this.state.list);
           const timeline = document.getElementById("timeline");
           timeline.innerHTML = "";
 
@@ -192,6 +193,8 @@ async function getTweets() {
             }
           this.increaseTotalTweets = this.increaseTotalTweets.bind(this);
           this.decreaseTotalTweets = this.decreaseTotalTweets.bind(this);
+          this.increaseTotalUsers = this.increaseTotalUsers.bind(this);
+          this.decreaseTotalUsers = this.decreaseTotalUsers.bind(this);
           this.resetState = this.resetState.bind(this);
           this.hideDisplay = this.hideDisplay.bind(this);
           this.AddPicsToDashboard = this.AddPicsToDashboard.bind(this);
