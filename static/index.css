@@ -3,6 +3,10 @@
   width: 100%;
 }
 
+#flex {
+  display: flex;
+}
+
 #buttonsWrapper {
   margin: 0 auto;
   width: 300px;
@@ -28,7 +32,7 @@
 }
 
 #render {
-  width: 100%;
+  width: 40%;
   background-color: lightyellow;
   display: inline-block;
 }
@@ -59,7 +63,6 @@
 
 #timeline {
   overflow: scroll;
-  margin: 0 auto;
   width: 600px;
   height: 800px;
 }
