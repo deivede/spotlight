@@ -1,4 +1,5 @@
-
+const { useState } = React
+const { useEffect} = React
 
 async function getTweets() {
 
@@ -9,36 +10,30 @@ async function getTweets() {
 
     console.log(friendsJSON);
 
-    class DisplayTwitter extends React.Component {
-        constructor(props) {
-            super(props);
-            this.state = {
-              new_tweets: 0,
-              set_opacity: 0.3,
-              set_visibility: "visible",
-              list: [],
-              value: '',
-              unreadTweets: 0,
-              pic_border: "Gainsboro",
-              decrease_user: true
-            }
-            this.requestTweets = this.requestTweets.bind(this);
-            this.removeBorder = this.removeBorder.bind(this);
-            this.renderTweetsList = this.renderTweetsList.bind(this);
-        }
+    function DisplayTwitter(props) {
 
-        removeBorder() {
-          if(this.state.decrease_user === false){
-            this.props.decreaseTotalUsers("twitter");
-            this.setState({decrease_user: true})
+        const [tweets, setTweets] = useState(0);
+        const [responseTweets, setResponseTweets] = useState(0)
+        const [opacity, setOpacity] = useState(0.3);
+        const [visibility, setVisibility] = useState("visible");
+        const [list, setList] = useState([]);
+        const [unreadTweets, setUnreadTweets] = useState(0);
+        const [picBorder, setPicBorder] = useState("Gainsboro");
+        const [decreaseUser, setDecreaseUser] = useState(true);
+        const [display, setDisplay] = useState("none")
+
+        const removeBorder = () => {
+          if(decreaseUser === false){
+            props.decreaseTotalUsers("twitter");
+            setDecreaseUser(true)
           }
-          this.props.resetUserPics("twitter");
-          this.setState({pic_border: "Gainsboro"});
+            props.resetUserPics("twitter");
+            setPicBorder("Gainsboro");
         }
 
-        requestTweets() {
-            const friendScreenName = this.props.screen_name
-            const friendId = this.props.id
+        const requestTweets = () => {
+            const friendScreenName = props.screen_name
+            const friendId = props.id
 
             const setTweetsState = (response) => {
                 {
@@ -49,33 +44,12 @@ async function getTweets() {
                             const newList = friend.tweets_array;
                             console.log(newTweet, newList);
 
-                            if(this.state.pic_border !== "red") {
-                              this.setState({unreadTweets: newTweet});
-                            } else {
-                              this.setState({unreadTweets: this.state.unreadTweets + newTweet});
-                            }
-
-                            this.setState({new_tweets: this.state.new_tweets + newTweet});
-                            this.props.increaseTotalTweets(this.state.unreadTweets, "twitter");
-
-                            if(newTweet > 0 && this.state.decrease_user === true) {
-                              this.props.AddPicsToDashboard(this.props.pic, "twitter");
-                              this.props.increaseTotalUsers("twitter");
-                              this.setState({decrease_user: false})
-                            }
+                            setResponseTweets(newTweet)
+                            setTweets( tweets + newTweet );
 
                             if(newList.length > 0) {
                                 for(let i=0 ; i<newList.length ; i++) {
-                                    this.setState({value: newList[i]});
-                                    console.log(this.state.value)
-                                    this.setState(state => {
-                                    const list = [state.value].concat(state.list);
-                                    return {
-                                        list,
-                                        value: '',
-                                    };
-                                  });
-                                  console.log(this.state.list)
+                                    setList(list => [...list, newList[i]]);
                                 }
                             }
                          })
@@ -102,12 +76,12 @@ async function getTweets() {
            fetchNewTweets();
         }
 
-        renderTweetsList() {
-          console.log(this.state.list);
+        const renderTweetsList = () => {
+          console.log(list);
           const timeline = document.getElementById("timeline");
           timeline.innerHTML = "";
 
-          const tweetsList = this.state.list;
+          const tweetsList = list;
           for(let i=1; i <= tweetsList.length ; i++){
               const newDiv = document.createElement("div");
               newDiv.setAttribute("id", i)
@@ -115,14 +89,16 @@ async function getTweets() {
               document.getElementById("timeline").appendChild(newDiv);
            }
 
-          for(let i=0; i < this.state.unreadTweets ; i++) {
+          for(let i=0; i < unreadTweets ; i++) {
               twttr.widgets.createTweet(
                    tweetsList[i],
                    document.getElementById(parseInt(i+1)),
+                   {
+                     align: "center"
+                   }
                  );
            }
 
-           const unreadTweets = this.state.unreadTweets
 
            function renderUnreadTweets(){
               for(let i = unreadTweets; i <= tweetsList.length ; i++) {
@@ -141,194 +117,188 @@ async function getTweets() {
             console.log(tweetsList);
         }
 
-        componentDidMount() {
-            const hideDisplay = async () => {
-              await this.requestTweets();
-              if(this.state.new_tweets == 0) {
-                this.setState({set_visibility: "hidden"});
-              }
+        useEffect(() => {
+          if(tweets > 0) {
+            if(picBorder !== "red") {
+              setUnreadTweets(responseTweets);
+            } else if(picBorder === "red") {
+              setUnreadTweets(unreadTweets + responseTweets);
             }
-            hideDisplay();
-            setInterval(() => this.requestTweets(), 300000);
-        }
 
-        componentDidUpdate(prevProps, prevState) {
-          if(this.state.new_tweets !== prevState.new_tweets) {
-              this.setState({pic_border: "red"});
-              this.setState({set_opacity: 1});
-              this.setState({set_visibility: "visible"});
+            if(decreaseUser === true) {
+              props.addPicsToDashboard(props.pic, "twitter");
+              props.increaseTotalUsers("twitter");
+              setDecreaseUser(false)
+            }
+              setDisplay("inline-block");
+              setPicBorder("red");
+              setOpacity(1);
+              setVisibility("visible");
+            }
+        }, [tweets]);
+
+        useEffect(() => {
+          console.log(responseTweets + "porra")
+          console.log(unreadTweets + "porra")
+          props.increaseTotalTweets(unreadTweets, "twitter");
+        }, [unreadTweets]);
+
+        useEffect(() => {
+          const hideDisplay = async () => {
+            await requestTweets();
+            if(tweets == 0) {
+              setVisibility("hidden");
+            }
           }
-        }
+          hideDisplay();
+          setInterval(() => requestTweets(), 300000);
+        },[]);
 
-        render() {
-            return (
-              <div className="displayWrapper">
-                <div className="displayBox">
-                  <div className="story" style={{borderColor: this.state.pic_border}}>
-                    <img src={this.props.pic}  className="PicClip"
-                    onClick={() => {this.renderTweetsList(); this.removeBorder(); this.props.decreaseTotalTweets(this.state.unreadTweets, "twitter");}}
-                    style={{opacity: this.state.set_opacity}}/>
-                    <div className="newTweetsDisplay" style={{ visibility: this.state.set_visibility}}>
-                      <div className="numberDisplay">
-                      {this.state.new_tweets}
-                      </div>
-                    </div>
+
+        return (
+          <div className="displayWrapper" style={{display: display}}>
+            <div className="displayBox">
+              <div className="story" style={{borderColor: picBorder}}>
+                <img src={props.pic}  className="PicClip"
+                onClick={() => {renderTweetsList(); removeBorder(); props.decreaseTotalTweets(unreadTweets, "twitter");}}
+                style={{opacity: opacity}}/>
+                <div className="newTweetsDisplay" style={{ visibility: visibility}}>
+                  <div className="numberDisplay">
+                  {tweets}
                   </div>
                 </div>
               </div>
-            )
-        }
+            </div>
+          </div>
+        )
     }
 
-    class Dashboard extends React.Component {
-        constructor(props) {
-          super(props);
-            this.state = {
-                totalTweets: 0,
-                totalUsers: 0,
-                idTwitter: 1,
-                Toggle: "block",
-                newTwitterUserPosts: [],
-                valueTwitter: '',
-            }
-          this.increaseTotalTweets = this.increaseTotalTweets.bind(this);
-          this.decreaseTotalTweets = this.decreaseTotalTweets.bind(this);
-          this.increaseTotalUsers = this.increaseTotalUsers.bind(this);
-          this.decreaseTotalUsers = this.decreaseTotalUsers.bind(this);
-          this.resetState = this.resetState.bind(this);
-          this.hideDisplay = this.hideDisplay.bind(this);
-          this.AddPicsToDashboard = this.AddPicsToDashboard.bind(this);
-          this.resetUserPics = this.resetUserPics.bind(this);
-        }
+    function Dashboard() {
 
-        AddPicsToDashboard(pic, dashboard){
+        const  [totalTweets, setTotalTweets] = useState(0);
+        const  [totalUsers, setTotalUsers] = useState(0);
+        const  [idTwitter, setidTwitter] = useState(1);
+        const  [toggle, setToggle] =  useState("block");
+        const  [newTwitterUserPosts, setNewTwitterUserPosts] = useState([]);
+
+        const addPicsToDashboard = (pic, dashboard) => {
           switch (dashboard) {
           case "twitter":
-            this.setState({valueTwitter: pic})
-            this.setState(state => {
-              const newTwitterUserPosts = [state.valueTwitter].concat(state.newTwitterUserPosts);
-              return {
-                  newTwitterUserPosts,
-                  valueTwitter: ''
-              };
-            });
+            setNewTwitterUserPosts(newTwitterUserPosts => [...newTwitterUserPosts, pic]);
             break;
-         }
+          }
         }
 
-        increaseTotalTweets(update, dashboard) {
+        const increaseTotalTweets = (update, dashboard) => {
           switch (dashboard) {
             case "twitter":
-              if(this.state.totalTweets >= 0) {
-                this.setState({totalTweets: this.state.totalTweets + update});
+              if(totalTweets >= 0) {
+                setTotalTweets(totalTweets + update);
               }
               break;
           }
         }
 
-        decreaseTotalTweets(update, dashboard) {
+        const decreaseTotalTweets = (update, dashboard) => {
           switch (dashboard) {
             case "twitter":
-              if(this.state.totalTweets > 0) {
-                this.setState({totalTweets: this.state.totalTweets - update});
+              if(totalTweets > 0) {
+                setTotalTweets( totalTweets - update );
               }
               break;
             }
         }
 
-        increaseTotalUsers(dashboard) {
+        const increaseTotalUsers = (dashboard) => {
           switch (dashboard) {
             case "twitter":
-              if(this.state.totalUsers >= 0) {
-                this.setState({totalUsers: this.state.totalUsers + 1});
+              if(totalUsers >= 0 && totalUsers < friendsLength) {
+                setTotalUsers( totalUsers + 1);
               }
               break;
             }
         }
 
-        decreaseTotalUsers(dashboard) {
+        const decreaseTotalUsers = (dashboard) => {
           switch (dashboard) {
             case "twitter":
-              if(this.state.totalUsers > 0) {
-                this.setState({totalUsers: this.state.totalUsers - 1});
+              if(totalUsers > 0) {
+                setTotalUsers( totalUsers - 1);
               }
               break;
             }
         }
 
-        resetState(dashboard) {
+        const resetState = (dashboard) => {
           switch (dashboard) {
             case "twitter":
-              this.setState({
-                totalTweets: 0,
-                totalUsers: 0,
-                newTwitterUserPosts: []
-              });
+              setTotalTweets(0)
+              setTotalUsers(0)
+              setNewTwitterUserPosts([])
               break;
           }
          }
 
-         resetUserPics(dashboard){
+        const resetUserPics = (dashboard) => {
            switch (dashboard) {
              case "twitter":
-              this.setState({newTwitterUserPosts: []});
+              setNewTwitterUserPosts([]);
+              break;
            }
          }
 
-        hideDisplay(dashboard) {
+        const hideDisplay = (dashboard) => {
           switch (dashboard) {
             case "twitter":
-              if(this.state.Toggle === "block") {
-               this.setState({Toggle: "none"})
+              if(toggle === "block") {
+               setToggle("none")
              } else {
-               this.setState({Toggle: "block"})
+               setToggle("block")
              }
              const timeline = document.getElementById("timeline");
              timeline.innerHTML = "";
-              break;
+             break;
           }
         }
 
-        render() {
-           var userDisplays = []
-           userDisplays = friendsArray.map(friendProps => (
-               <DisplayTwitter key={this.state.idTwitter + friendProps.index}
-                               key_id={this.state.idTwitter + friendProps.index}
+        var userDisplays = []
+        userDisplays = friendsArray.map(friendProps => (
+               <DisplayTwitter key={idTwitter + friendProps.index}
+                               key_id={idTwitter + friendProps.index}
                                screen_name={friendProps.screen_name[0]}
                                pic={friendProps.pic[0]}
                                id={friendProps.id}
-                               increaseTotalTweets={this.increaseTotalTweets}
-                               decreaseTotalTweets={this.decreaseTotalTweets}
-                               increaseTotalUsers={this.increaseTotalUsers}
-                               decreaseTotalUsers={this.decreaseTotalUsers}
-                               AddPicsToDashboard={this.AddPicsToDashboard}
-                               resetUserPics={this.resetUserPics}
+                               increaseTotalTweets={increaseTotalTweets}
+                               decreaseTotalTweets={decreaseTotalTweets}
+                               increaseTotalUsers={increaseTotalUsers}
+                               decreaseTotalUsers={decreaseTotalUsers}
+                               addPicsToDashboard={addPicsToDashboard}
+                               resetUserPics={resetUserPics}
                 />));
-           userDisplays.unshift(<button className="resetDashboard" onClick={() => {this.resetState("twitter");}}>Reset</button>)
 
             return (
               <div>
                 <div id="dashboardWrapper">
                   <div id="buttonsWrapper">
-                    <button onClick={() => {this.hideDisplay("twitter")}} className="dashboard" >
+                    <button onClick={() => {hideDisplay("twitter")}} className="dashboard" >
                       <span href="#" className="fa fa-twitter"></span>
-                      <span className="dashboardDisplay">{this.state.totalTweets}</span>
-                      <span className="dashboardDisplay users">{this.state.totalUsers}</span>
+                      <span className="dashboardDisplay">{totalTweets}</span>
+                      <span className="dashboardDisplay users">{totalUsers}</span>
                       <div>
-                        <img className="PicClip small" src={this.state.newTwitterUserPosts[0]}/>
-                        <img className="PicClip small" src={this.state.newTwitterUserPosts[1]}/>
-                        <img className="PicClip small" src={this.state.newTwitterUserPosts[2]}/>
-                        <img className="PicClip small" src={this.state.newTwitterUserPosts[3]}/>
+                        <img className="PicClip small" src={newTwitterUserPosts[0]}/>
+                        <img className="PicClip small" src={newTwitterUserPosts[1]}/>
+                        <img className="PicClip small" src={newTwitterUserPosts[2]}/>
+                        <img className="PicClip small" src={newTwitterUserPosts[3]}/>
                       </div>
                     </button>
                   </div>
                 </div>
-                <div id="twitter" style={{display: this.state.Toggle}}>
+                <div id="twitter" style={{display: toggle}}>
                   {userDisplays}
                 </div>
               </div>
             )
-          }
+
     }
 
     ReactDOM.render( <Dashboard /> ,
