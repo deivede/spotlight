@@ -20,7 +20,7 @@ async function getTweets() {
         const [unreadTweets, setUnreadTweets] = useState(0);
         const [picBorder, setPicBorder] = useState("Gainsboro");
         const [decreaseUser, setDecreaseUser] = useState(true);
-        const [display, setDisplay] = useState("none")
+        const [display, setDisplay] = useState("none");
 
         const removeBorder = () => {
           if(decreaseUser === false){

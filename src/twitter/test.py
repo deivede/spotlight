@@ -21,12 +21,5 @@ class testDBandAPI(unittest.TestCase):
         self.assertEqual(typecheck, hh)
 
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()

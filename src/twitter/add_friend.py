@@ -1,5 +1,5 @@
-from keys import *
-from config import *
+from src.twitter.keys import *
+from src.twitter.config import *
 import pymongo, tweepy
 from pymongo import MongoClient
 
@@ -15,13 +15,17 @@ class userObject(object):
         self.protected = protected,
         self.view_status = view_status
 
-def getFriends(friendId, count):
-    friendsData = api.friends(friendId , count=count)
+def setDBdocument(userId):
+    exists = db.users.find_one({'screen_name': userId})
+
+    if not exists:
+        db.users.insert_one({'screen_name': userId})
+
+def getFriends(userId):
+    friendsData = api.friends(userId)
     return friendsData
 
-
 def setFriendsDict(friendsData):
-
     friendsList = {}
 
     for i in range(len(friendsData)):
@@ -32,7 +36,7 @@ def setFriendsDict(friendsData):
             _profile_image_url = friendsData[i].profile_image_url
             _url = friendsData[i].url
             _protected = friendsData[i].protected
-            _last_tweet = friendsData[i].status.id
+            _last_tweet = 0
             _view_status = False
 
             newFriend = userObject(_id, _id_str, _name, _screen_name, _last_tweet, _profile_image_url, _url, _protected, _view_status)
@@ -40,9 +44,9 @@ def setFriendsDict(friendsData):
 
     return friendsList
 
-def pushFriendsToDB(friends):
-    for i in range(len(friends)):
-        index = list(friends)[i]
+def pushFriendsToDB(userId ,friendsList):
+    for i in range(len(friendsList)):
+        index = list(friendsList)[i]
         key = 'twitter.' + index
-        values = list(friends.values())[i]
-        db.users.find_one_and_update({'screen_name': 'deivede'}, {'$set': { key: values}})
+        values = list(friendsList.values())[i]
+        db.users.find_one_and_update({'screen_name': userId}, {'$set': { key: values}})
