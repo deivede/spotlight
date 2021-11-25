@@ -1,8 +1,10 @@
 import tweepy
-from src.twitter.keys import *
+# from src.twitter.keys import *
 # from keys import *
-from src.twitter.config import *
+# from src.twitter.config import *
 # from config import *
+from src.twitter.heroku_keys import *
+from src.twitter.heroku_config import *
 import requests
 
 def updateProfileImage(user):
