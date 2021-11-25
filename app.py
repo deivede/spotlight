@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, make_response, redirect
-from src.twitter.get_status import getNewTweets, setTweetsJSON
+from src.twitter.get_status import getNewTweets, setTweetsJSON, getOldTweets, setOldTweetsJSON
 from src.twitter.get_friends import setViewStatus, getTrueViewStatus, setFriendsArray
+from src.twitter.update_friend import updateProfileImage
 
 app = Flask(__name__)
 
@@ -29,10 +30,25 @@ def update():
     friendId = rawID.decode("utf-8")
 
     tweetsAPI = getNewTweets("deivede", friendId)
-    tweetsJSON = setTweetsJSON(tweetsAPI)
+    oldTweetsJSON = getOldTweets("deivede", friendId)
+    tweetsJSON = setTweetsJSON(tweetsAPI, oldTweetsJSON)
 
     responseJSON = make_response(jsonify({"new_tweet": tweetsJSON["new_tweet"],
-                                         "tweets_array": tweetsJSON["tweets_array"]}), 200)
+                                         "tweets_array": tweetsJSON["tweets_array"],
+                                         "old_tweets": tweetsJSON["old_tweets"]}), 200)
+
+    return responseJSON
+
+@app.route("/oldtweets", methods=["POST"])
+def old():
+
+    rawID = request.data
+    friendId = rawID.decode("utf-8")
+
+    oldTweetsJSON = getOldTweets("deivede", friendId)
+    tweetsJSON = setOldTweetsJSON(oldTweetsJSON)
+
+    responseJSON = make_response(jsonify({"old_tweets": tweetsJSON["old_tweets"]}), 200)
 
     return responseJSON
 

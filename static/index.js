@@ -20,14 +20,15 @@ async function getTweets() {
         const [unreadTweets, setUnreadTweets] = useState(0);
         const [picBorder, setPicBorder] = useState("Gainsboro");
         const [decreaseUser, setDecreaseUser] = useState(true);
-        const [display, setDisplay] = useState("none")
+        const [display, setDisplay] = useState("none");
+        const [oldTweets, setOldTweets] = useState([]);
+        const [decreaseTweets, setDecreaseTweets] = useState(true);
 
         const removeBorder = () => {
           if(decreaseUser === false){
             props.decreaseTotalUsers("twitter");
             setDecreaseUser(true)
           }
-            props.resetUserPics("twitter");
             setPicBorder("Gainsboro");
         }
 
@@ -42,13 +43,20 @@ async function getTweets() {
                         .then( friend => {
                             const newTweet = friend.new_tweet;
                             const newList = friend.tweets_array;
-                            console.log(newTweet, newList);
+                            const oldTweet = friend.old_tweets;
 
-                            setResponseTweets(newTweet)
-                            setTweets( tweets + newTweet );
+                            console.log(newTweet, newList);
+                            console.log(oldTweet);
+
+                            setOldTweets(oldTweet)
+                            setResponseTweets(newTweet);
+                            if(newTweet > 0) {
+                            setTweets( tweets + newTweet)
+                            setDecreaseTweets(true)
+                          }
 
                             if(newList.length > 0) {
-                                for(let i=0 ; i<newList.length ; i++) {
+                                for(let i=0 ; i < newList.length ; i++) {
                                     setList(list => [...list, newList[i]]);
                                 }
                             }
@@ -68,54 +76,24 @@ async function getTweets() {
                         "content-type": "application/json"
                     })
                 });
-
                   return setTweetsState(tweetsData);
             }
-
-
            fetchNewTweets();
         }
 
-        const renderTweetsList = () => {
-          console.log(list);
-          const timeline = document.getElementById("timeline");
-          timeline.innerHTML = "";
+        const sendData = () => {
+          console.log("me diga então")
+          console.log(oldTweets)
+          props.parentCallback(list, unreadTweets, oldTweets);
+      }
 
-          const tweetsList = list;
-          for(let i=1; i <= tweetsList.length ; i++){
-              const newDiv = document.createElement("div");
-              newDiv.setAttribute("id", i)
-              newDiv.innerHTML = "";
-              document.getElementById("timeline").appendChild(newDiv);
-           }
-
-          for(let i=0; i < unreadTweets ; i++) {
-              twttr.widgets.createTweet(
-                   tweetsList[i],
-                   document.getElementById(parseInt(i+1)),
-                   {
-                     align: "center"
-                   }
-                 );
-           }
-
-
-           function renderUnreadTweets(){
-              for(let i = unreadTweets; i <= tweetsList.length ; i++) {
-                    twttr.widgets.createTweet(
-                      tweetsList[i],
-                      document.getElementById(parseInt(i))
-                    );
-                 }
-             }
-
-            const renderMoreButton = document.createElement("button");
-            renderMoreButton.addEventListener("click", renderUnreadTweets);
-            renderMoreButton.setAttribute("id", "loadButton");
-            renderMoreButton.innerHTML = "Mais Tweets";
-            document.getElementById("timeline").appendChild(renderMoreButton);
-            console.log(tweetsList);
+      const decrease = () => {
+          if( decreaseTweets === true) {
+          setTimeout(() => props.decreaseTotalTweets(unreadTweets, "twitter"), 200)
         }
+        setDecreaseTweets(false)
+      }
+
 
         useEffect(() => {
           if(tweets > 0) {
@@ -126,7 +104,6 @@ async function getTweets() {
             }
 
             if(decreaseUser === true) {
-              props.addPicsToDashboard(props.pic, "twitter");
               props.increaseTotalUsers("twitter");
               setDecreaseUser(false)
             }
@@ -138,8 +115,6 @@ async function getTweets() {
         }, [tweets]);
 
         useEffect(() => {
-          console.log(responseTweets + "porra")
-          console.log(unreadTweets + "porra")
           props.increaseTotalTweets(unreadTweets, "twitter");
         }, [unreadTweets]);
 
@@ -156,11 +131,11 @@ async function getTweets() {
 
 
         return (
-          <div className="displayWrapper" style={{display: display}}>
+          <div className="displayWrapper" style={{ display: display}}>
             <div className="displayBox">
               <div className="story" style={{borderColor: picBorder}}>
                 <img src={props.pic}  className="PicClip"
-                onClick={() => {renderTweetsList(); removeBorder(); props.decreaseTotalTweets(unreadTweets, "twitter");}}
+                onClick={() => {sendData(); removeBorder(); decrease();}}
                 style={{opacity: opacity}}/>
                 <div className="newTweetsDisplay" style={{ visibility: visibility}}>
                   <div className="numberDisplay">
@@ -171,23 +146,80 @@ async function getTweets() {
             </div>
           </div>
         )
-    }
+}
+
+    function TwitterUsers(props) {
+      const [oldTweets, setOldTweets] = useState([]);
+
+      const requestTweets = () => {
+          const friendScreenName = props.screen_name
+          const friendId = props.id
+
+          const setTweetsState = (response) => {
+              {
+                  if (response.ok) {
+                      response.json()
+                      .then( friend => {
+                          const oldTweet = friend.old_tweets;
+                          console.log(oldTweet);
+                          setOldTweets(oldTweet)
+                })
+              }  else {
+                      console.log("No new tweets from" + friendScreenName);
+                  }
+              }
+          }
+
+          async function fetchNewTweets() {
+              const tweetsData = await fetch('/oldtweets', {
+                  method: "POST",
+                  body: friendId,
+                  headers: new Headers({
+                      "content-type": "application/json"
+                  })
+              });
+                return setTweetsState(tweetsData);
+          }
+         fetchNewTweets();
+      }
+
+      const getOld = () => {
+        props.getOld(oldTweets);
+        console.log("jao")
+        console.log(oldTweets)
+      }
+
+      useEffect(() => {
+        requestTweets();
+      },[])
+
+        return (
+          <div className="displayWrapper" >
+            <div className="displayBox">
+              <div className="story" >
+                <img src={props.pic}  className="PicClip"
+                onClick={() => getOld()}
+              />
+              </div>
+            </div>
+          </div>
+        )
+}
 
     function Dashboard() {
-
         const  [totalTweets, setTotalTweets] = useState(0);
         const  [totalUsers, setTotalUsers] = useState(0);
         const  [idTwitter, setidTwitter] = useState(1);
         const  [toggle, setToggle] =  useState("block");
         const  [newTwitterUserPosts, setNewTwitterUserPosts] = useState([]);
-
-        const addPicsToDashboard = (pic, dashboard) => {
-          switch (dashboard) {
-          case "twitter":
-            setNewTwitterUserPosts(newTwitterUserPosts => [...newTwitterUserPosts, pic]);
-            break;
-          }
-        }
+        const  [tweetData, setTweetData] = useState([]);
+        const [embedTweets, setEmbedTweets] = useState([]);
+        const [dataLength, setDataLength] = useState(0);
+        const [display, setDisplay] = useState("none");
+        const [unreadTweets, setUnreadTweets] = useState(0);
+        const [oldTweets, setOldTweets] = useState([]);
+        const [usersVisibility, setUsersVisibility] = useState(true);
+        const [visibility, setVisibility] = useState("hidden");
 
         const increaseTotalTweets = (update, dashboard) => {
           switch (dashboard) {
@@ -198,7 +230,6 @@ async function getTweets() {
               break;
           }
         }
-
         const decreaseTotalTweets = (update, dashboard) => {
           switch (dashboard) {
             case "twitter":
@@ -208,7 +239,6 @@ async function getTweets() {
               break;
             }
         }
-
         const increaseTotalUsers = (dashboard) => {
           switch (dashboard) {
             case "twitter":
@@ -218,7 +248,6 @@ async function getTweets() {
               break;
             }
         }
-
         const decreaseTotalUsers = (dashboard) => {
           switch (dashboard) {
             case "twitter":
@@ -229,37 +258,75 @@ async function getTweets() {
             }
         }
 
-        const resetState = (dashboard) => {
-          switch (dashboard) {
-            case "twitter":
-              setTotalTweets(0)
-              setTotalUsers(0)
-              setNewTwitterUserPosts([])
-              break;
-          }
-         }
-
-        const resetUserPics = (dashboard) => {
-           switch (dashboard) {
-             case "twitter":
-              setNewTwitterUserPosts([]);
-              break;
-           }
-         }
-
-        const hideDisplay = (dashboard) => {
-          switch (dashboard) {
-            case "twitter":
-              if(toggle === "block") {
-               setToggle("none")
-             } else {
-               setToggle("block")
-             }
-             const timeline = document.getElementById("timeline");
-             timeline.innerHTML = "";
-             break;
-          }
+        const callbackFunction = (list, unreadTweets, oldTweets) => {
+          console.log(list)
+          setTweetData(list);
+          setDataLength(list.length)
+          setUnreadTweets(unreadTweets)
+          setOldTweets(oldTweets)
+          setVisibility("visible")
         }
+
+        useEffect(() => {
+          for(let i=0; i <= dataLength; i++) {
+            var timeline = document.getElementById(i);
+            if(timeline){
+            timeline.innerHTML = "";
+            }
+          }
+          console.log(unreadTweets)
+          console.log(tweetData)
+          for(let i=0; i < unreadTweets ; i++) {
+              twttr.widgets.createTweet(
+                   tweetData[i].tweetId,
+                   document.getElementById(parseInt(i)),
+                   {
+                     align: "center"
+                   }
+                 );
+           }
+        }, [tweetData, unreadTweets])
+
+        const renderLinkedTweets = (i) => {
+          const div = document.getElementById("linkedtweets");
+          div.innerHTML = "";
+
+          console.log(tweetData[i].linkedTweet);
+          twttr.widgets.createTweet(
+               tweetData[i].linkedTweet,
+               document.getElementById("linkedtweets"),
+               {
+                 align: "center"
+               }
+             );
+        }
+
+        const renderUnreadTweets = () => {
+           for(let i = unreadTweets; i <= tweetData.length ; i++) {
+                 twttr.widgets.createTweet(
+                   tweetData[i].tweetId,
+                   document.getElementById(parseInt(i))
+                 );
+              }
+          }
+
+        const renderOldTweets = () => {
+          const div = document.getElementById("linkedtweets");
+          div.innerHTML = "";
+           for(let y=0; y < 20 ; y++) {
+                 twttr.widgets.createTweet(
+                   oldTweets[y],
+                   document.getElementById("linkedtweets")
+                 );
+              }
+          }
+
+          const getOld = (alltweets) => {
+            console.log("cads")
+              setOldTweets(alltweets);
+              setTimeout(() => renderOldTweets(), 1000);
+          }
+
 
         var userDisplays = []
         userDisplays = friendsArray.map(friendProps => (
@@ -272,37 +339,86 @@ async function getTweets() {
                                decreaseTotalTweets={decreaseTotalTweets}
                                increaseTotalUsers={increaseTotalUsers}
                                decreaseTotalUsers={decreaseTotalUsers}
-                               addPicsToDashboard={addPicsToDashboard}
-                               resetUserPics={resetUserPics}
+                               parentCallback={callbackFunction}
                 />));
 
-            return (
-              <div>
-                <div id="dashboardWrapper">
-                  <div id="buttonsWrapper">
-                    <button onClick={() => {hideDisplay("twitter")}} className="dashboard" >
-                      <span href="#" className="fa fa-twitter"></span>
-                      <span className="dashboardDisplay">{totalTweets}</span>
-                      <span className="dashboardDisplay users">{totalUsers}</span>
-                      <div>
-                        <img className="PicClip small" src={newTwitterUserPosts[0]}/>
-                        <img className="PicClip small" src={newTwitterUserPosts[1]}/>
-                        <img className="PicClip small" src={newTwitterUserPosts[2]}/>
-                        <img className="PicClip small" src={newTwitterUserPosts[3]}/>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-                <div id="twitter" style={{display: toggle}}>
-                  {userDisplays}
-                </div>
-              </div>
-            )
+        var twitterUsers = []
+        twitterUsers = friendsArray.map(friendProps => (
+               <TwitterUsers key={idTwitter + friendProps.index + 1}
+                               key_id={idTwitter + friendProps.index + 1}
+                               screen_name={friendProps.screen_name[0]}
+                               pic={friendProps.pic[0]}
+                               id={friendProps.id}
+                               getOld={getOld}
+                />));
 
-    }
+          var tweetsElement = []
+
+          if(dataLength == 0) {
+            tweetsElement.push(<div>
+                               </div>)
+          } else {
+            for(let i=0; i < dataLength; i++) {
+              tweetsElement.push(<div>
+                                  <div id={i}></div>
+                                  <button
+                                          onClick={() => renderLinkedTweets(i)}
+                                          className="linkedtweet"
+                                  >
+                                  linked tweet
+                                  </button>
+                                 </div>)
+            }
+          }
+
+
+          tweetsElement.push(<button
+                  onClick={() => renderUnreadTweets()}
+                  className="linkedtweet"
+          >
+          More Tweets
+          </button>)
+
+          tweetsElement.unshift(<button
+                  onClick={() => renderOldTweets()}
+                  className="linkedtweet"
+          >
+          Old Tweets
+          </button>)
+
+          const displayUsers = () => {
+            display == "none" ? setDisplay("block") : setDisplay("none")
+          }
+
+        return (
+            <div>
+              <nav id="navbar"><a href="/config">Config</a></nav><button onClick={() =>  displayUsers()}>users</button>
+              <div id="flex">
+                <div id="render">
+                    <div className="dashboard">
+                      <span className="dashboardDisplay"><span className="totalTweets">{totalTweets}</span></span>
+                      <span className="dashboardDisplay users"><span className="totalTweets">{totalUsers}</span></span>
+                    </div>
+                    <div style={{display: display}}>
+                      {twitterUsers}
+                    </div>
+                    <div>
+                      {userDisplays}
+                    </div>
+                  </div>
+                <div id="timeline" style={{visibility: visibility}}>
+                 {tweetsElement}
+                </div>
+                <div id="linkedtweets"></div>
+              </div>
+            </div>
+          )
+
+          }
+
 
     ReactDOM.render( <Dashboard /> ,
-         document.getElementById("render"));
+         document.getElementById("app"));
 
 }
 
