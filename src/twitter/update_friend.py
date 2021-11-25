@@ -1,6 +1,8 @@
 import tweepy
-from keys import *
-from config import *
+from src.twitter.keys import *
+# from keys import *
+from src.twitter.config import *
+# from config import *
 import requests
 
 def updateProfileImage(user):
