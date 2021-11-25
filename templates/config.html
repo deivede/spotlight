@@ -7,11 +7,15 @@
 
 </head>
 <body>
+<form method="get">
+<input formaction="/updatepics" value="atualiar pics" type="submit">
+</form>
 <form method="post">
 <table class="table">
   <tbody>
 {% for friend in friends.values() %}
     <tr>
+      <td><img src={{friend.profile_image_url}}></img><td
       <td>@{{friend.screen_name[0]}}</td>
 {% if friend.view_status %}
       <td style="color: green">active</td>

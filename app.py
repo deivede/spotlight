@@ -46,6 +46,13 @@ def data():
     print(responseJSON)
     return responseJSON
 
+@app.route("/updatepics", methods=["GET"])
+def pics():
+
+    updateProfileImage("deivede")
+
+    return 200
+
 
 
 if __name__ == "__main__":
