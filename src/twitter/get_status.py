@@ -15,7 +15,13 @@ def getOldTweets(user, friendId):
     if tweetStorage:
         oldTweets = tweetStorage
 
-    return oldTweets
+    oldTweetsArray = []
+
+    for i in range(len(oldTweets)):
+                oldTweetsArray.append({"tweetId": oldTweets[i],
+                                    "linkedTweet": ""})
+
+    return oldTweetsArray
 
 def getNewTweets(user, friendId):
 
@@ -53,13 +59,13 @@ def getNewTweets(user, friendId):
 
 def setOldTweetsJSON(oldTweets):
 
-    TweetsJSON = {
+    oldTweetsJSON = {
         "old_tweets": oldTweets
     }
 
-    return TweetsJSON
+    return oldTweetsJSON
 
-def setTweetsJSON(newTweets, oldTweets):
+def setTweetsJSON(newTweets):
     TweetsArray = []
 
     for i in range(len(newTweets)):
@@ -76,7 +82,6 @@ def setTweetsJSON(newTweets, oldTweets):
     TweetsJSON = {
         "new_tweet": newTweetsLen,
         "tweets_array": TweetsArray,
-        "old_tweets": oldTweets
     }
 
     print(TweetsArray)

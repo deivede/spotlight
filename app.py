@@ -30,12 +30,10 @@ def update():
     friendId = rawID.decode("utf-8")
 
     tweetsAPI = getNewTweets("deivede", friendId)
-    oldTweetsJSON = getOldTweets("deivede", friendId)
-    tweetsJSON = setTweetsJSON(tweetsAPI, oldTweetsJSON)
+    tweetsJSON = setTweetsJSON(tweetsAPI)
 
     responseJSON = make_response(jsonify({"new_tweet": tweetsJSON["new_tweet"],
-                                         "tweets_array": tweetsJSON["tweets_array"],
-                                         "old_tweets": tweetsJSON["old_tweets"]}), 200)
+                                         "tweets_array": tweetsJSON["tweets_array"]}), 200)
 
     return responseJSON
 
