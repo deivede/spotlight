@@ -1,18 +1,16 @@
-#dashboardWrapper {
-  /* height: 110px;
-  width: 100%; */
+
+#buttons {
+  margin: 0 auto;
 }
 
 #flex {
   display: flex;
+  justify-content: center;
 }
 
 #navbar {
   display: block;
-}
-
-a {
-  padding: 5px
+  border-bottom: 1px solid;
 }
 
 .linkedtweet {
@@ -27,29 +25,13 @@ a {
   height: 1000px;
 }
 
-#buttonsWrapper {
-}
-
-.dashboard {
- width: 100%;
- height: 110px;
- /* background-color: LightBlue; */
- text-align: center;
- font-weight: bold;
- font-size: 20px;
- font-family: sans-serif;
- color: white;
-}
-
 
 #render {
-  width: 40%;
-  background-color: lightyellow;
-  display: inline-block;
-}
-
-.displayWrapper {
-  display: inline-block;
+  height: 140px;
+  width: 670px;
+  margin: 0 auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .nick {
@@ -79,9 +61,50 @@ a {
 }
 
 #timeline {
-  overflow: scroll;
-  width: 600px;
-  height: 1000px;
+  overflow: auto;
+  width: 575px;
+  height: 600px;
+  border: 1px solid;
+}
+
+  .dashboard {
+    height: 100%;
+    width: 20%;
+    display: inline-block;
+    position: relative;
+    bottom: 30px;
+  }
+
+#sidebar {
+  overflow: auto;
+  width: 575px;
+  height: 600px;
+  border: 1px solid;
+}
+
+#userbar {
+  height: 100%;
+  width: 60%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  background-color: lightyellow;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 auto;
+  scrollbar-width: none;
+}
+
+
+#scrollButtonsWrap {
+  width: 20%;
+  display: inline;
+}
+
+.renderLinkedtt {
+  width: 100%;
+  height: 20px;
+  text-align: center;
 }
 
 .displayBox {
@@ -91,15 +114,17 @@ a {
 }
 
 .dashboardDisplay {
-  height: 80px;
-  width: 80px;
+  width: 30px;
+  height: 70px;
   background-color: sandybrown;
-  border-radius: 50%;
   display: inline-block;
   text-align: center;
-  font-size: 2.8em;
-  position: relative;
-  top: 10px;
+  font-size: 1.8em;
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  font-family: sans-serif;
+  color: white;
 }
 
 .dashboardDisplay.users {
@@ -107,16 +132,27 @@ a {
 }
 
 .totalTweets {
-  position: relative;
-  top: 12px;
+  height: 50%;
+  width: 100%;
 }
 
-.resetDashboard {
-  border-radius: 50%;
-  height: 60px;
-  width: 60px;
+#upDisplay {
+  background-color: lightblue
+}
+
+#downDisplay {
+  background-color: lightgreen
+}
+
+.totalTweetsnumber {
+  height: 20px;
+  text-align: center;
   position: relative;
-  bottom: 37px;
+  top: 25px;
+}
+
+.ScrollButton {
+  display: inline-block;
 }
 
 .newTweetsDisplay {
