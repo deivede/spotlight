@@ -15,11 +15,12 @@ def getOldTweets(user, friendId):
     if tweetStorage:
         oldTweets = tweetStorage
 
-    oldTweetsArray = []
+    oldTweetsArray = oldTweets
 
-    for i in range(len(oldTweets)):
-                oldTweetsArray.append({"tweetId": oldTweets[i],
-                                    "linkedTweet": ""})
+    # for i in range(len(oldTweets)):
+    #             oldTweetsArray.append({"tweetId": oldTweets[i],
+    #
+    #                                 "linkedTweet": ""})
 
     return oldTweetsArray
 
@@ -38,8 +39,8 @@ def getNewTweets(user, friendId):
     newTweets = []
     oldTweets = []
 
-    newTweets = api.user_timeline(since_id=lastTweet, user_id=id)
-    oldTweets = api.user_timeline(user_id=id, exclude_replies="true")
+    newTweets = api.user_timeline(since_id=lastTweet, user_id=id, count=30)
+    oldTweets = api.user_timeline(user_id=id, exclude_replies="true", count=30)
 
     if newTweets:
         for i in range(len(newTweets)):
@@ -51,7 +52,9 @@ def getNewTweets(user, friendId):
     LastCallTweets = []
 
     for i in range(len(oldTweets)):
-        LastCallTweets.append(oldTweets[i].id_str)
+        LastCallTweets.append({"tweetId": oldTweets[i].id_str,
+                                "created_at": oldTweets[i].created_at,
+                                "linkedTweet": ""})
 
     db.users.update_one({"screen_name": user}, { "$set": { LastTweets: LastCallTweets }})
 
