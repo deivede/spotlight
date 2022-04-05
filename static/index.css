@@ -1,6 +1,17 @@
+body {
+  background-color: rgb(250,250,250);
+}
+
+#app {
+}
+
+a {
+  font-family: sans-serif;
+  font-weight: bold
+}
 
 #buttons {
-  margin: 0 auto;
+  color: black;
 }
 
 #flex {
@@ -11,6 +22,8 @@
 #navbar {
   display: block;
   border-bottom: 1px solid;
+  display: flex;
+  justify-content: space-evenly;
 }
 
 .linkedtweet {
@@ -32,6 +45,7 @@
   margin: 0 auto;
   margin-top: 30px;
   margin-bottom: 30px;
+  display: flex
 }
 
 .nick {
@@ -64,53 +78,94 @@
   overflow: auto;
   width: 575px;
   height: 600px;
-  border: 1px solid;
+  border: 1px solid rgb(219,219,219);
+  background-color: rgb(255,255,255);
 }
 
-  .dashboard {
-    height: 100%;
-    width: 20%;
-    display: inline-block;
-    position: relative;
-    bottom: 30px;
-  }
+.dashboard {
+  height: 100%;
+  width: 20%;
+  display: inline-block;
+  border: 1px solid rgb(219,219,219);
+}
 
 #sidebar {
   overflow: auto;
-  width: 575px;
+  width: 320px;
   height: 600px;
-  border: 1px solid;
+  border: 1px solid rgb(219,219,219);
+  background-color: rgb(255,255,255);
+}
+
+.displayDate {
+  display: inline;
+  text-align: center;
+  position: relative;
+  bottom: 15px;
+  font-family: sans-serif;
+  color: rgb(142,142,142);
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.SideBarCell {
+  height: 52px;
+  width: 90%;
+  margin-top: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
 }
 
 #userbar {
-  height: 100%;
-  width: 60%;
+  height: 80%;
+  width: 100%;
   overflow-x: scroll;
   overflow-y: hidden;
-  background-color: lightyellow;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
   margin: 0 auto;
   scrollbar-width: none;
+  position: relative;
+  top: 15px;
+}
+
+#parentBar {
+  height: 100%;
+  width: 80%;
+  background-color: rgb(255,255,255);
+  display: inline-flex;
+  border: 1px solid rgb(219,219,219);
 }
 
 
 #scrollButtonsWrap {
-  width: 20%;
-  display: inline;
+  width: 10%;
+  display: inline-flex;
+  height: 20%
 }
 
 .renderLinkedtt {
-  width: 100%;
+  width: 96%;
   height: 20px;
   text-align: center;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .displayBox {
   height: 90px;
-  width: 110px;
+  width: 70px;
   display: inline-block;
+  margin: 10px;
+}
+
+.displaySideBar {
+  height: 50px;
+  width: 50px;
+  display: inline-block;
+  margin: 2px;
 }
 
 .dashboardDisplay {
@@ -136,12 +191,12 @@
   width: 100%;
 }
 
-#upDisplay {
-  background-color: lightblue
-}
-
-#downDisplay {
-  background-color: lightgreen
+.countDisplay {
+  font-family: sans-serif;
+  font-weight: bold;
+  color: rgb(142,142,142);
+  background-color: rgb(255,255,255);
+  border-bottom: 1px solid rgb(219,219,219);
 }
 
 .totalTweetsnumber {
@@ -158,7 +213,7 @@
 .newTweetsDisplay {
   height: 20px;
   width: 20px;
-  background-color: lightpink;
+  background-color: #ea0b0b91;
   border-radius: 50%;
   display: inline-block;
   position: relative;
@@ -186,7 +241,21 @@
 }
 
 .PicClip.small{
-  height:0px;
-  width:0px;
+  height:45px;
+  width:45px;
   margin: 0px;
+}
+
+.loader {
+  border: 2px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 2px solid #3498db;
+  width: 14px;
+  height: 14px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

@@ -93,9 +93,9 @@ async function getTweets() {
 
         useEffect(() => {
           if(tweets > 0) {
-            if(picBorder !== "red") {
+            if(picBorder !== "#ea0b0b91") {
               setUnreadTweets(responseTweets);
-            } else if(picBorder === "red") {
+            } else if(picBorder === "#ea0b0b91") {
               setUnreadTweets(unreadTweets + responseTweets);
             }
 
@@ -104,7 +104,7 @@ async function getTweets() {
               setDecreaseUser(false)
             }
               setDisplay("inline-block");
-              setPicBorder("red");
+              setPicBorder("#ea0b0b91");
               setOpacity(1);
               setVisibility("visible");
             }
@@ -144,6 +144,7 @@ async function getTweets() {
 
     function TwitterUsers(props) {
       const [oldTweets, setOldTweets] = useState([])
+      const [createdAt, setCreatedAt] = useState("")
 
       const requestTweets = () => {
           const friendScreenName = props.screen_name
@@ -155,8 +156,10 @@ async function getTweets() {
                       response.json()
                       .then( friend => {
                           const oldTweet = friend.old_tweets;
+                          const createdDate = friend.old_tweets[0].created_at;
                           console.log(oldTweet);
                           setOldTweets(oldTweet)
+                          setCreatedAt(createdDate)
                        })
                 }
                 else {
@@ -188,13 +191,14 @@ async function getTweets() {
     },[])
 
         return (
-            <div className="displayBox">
-              <div className="story" >
-                <img src={props.pic}  className="PicClip"
+          <div className="SideBarCell">
+            <div className="displaySideBar">
+                <img src={props.pic}  className="PicClip small"
                 onClick={() => sendData()}
               />
-              </div>
             </div>
+            <div className="displayDate">{createdAt}</div>
+         </div>
         )
 }
 
@@ -207,7 +211,10 @@ async function getTweets() {
                       props.tweetData.tweetId ,
                       document.getElementById(props.order),
                       { align: "center", conversation: "none" , dnt: false}
-              )
+              ).then(() => {
+                      const ff = document.getElementById("wheel" + props.order);
+                      ff.remove()
+                    });
     })
 
       const showLinkedTweets = (revert) => {
@@ -232,11 +239,13 @@ async function getTweets() {
 
       if(props.tweetData.linkedTweet) {
          return (<div className="renderedTweet">
+                    <div className="loader" id={"wheel" + props.order}></div>
                     <div id={props.order}></div>
                     <button className="renderLinkedtt" onClick={() => showLinkedTweets(revert)} >Show linked tweet</button>
                     <div id={"linkedTweet" + props.order}></div>
                 </div> )} else {
                   return (<div className="renderedTweet">
+                             <div className="loader" id={"wheel" + props.order}></div>
                              <div id={props.order}></div>
                          </div>)
                 }
@@ -334,7 +343,7 @@ async function getTweets() {
             , [tweetData])
 
             useEffect(() => {
-            console.log("ODO")
+
                 var elements = []
                 for(let i=0; i < oldTweets.length; i++) {
                   const el = document.getElementById(i);
@@ -343,39 +352,36 @@ async function getTweets() {
                 }
                   elements.push(<RenderedTweets tweetData={oldTweets[i]}
                                                      order={i}/>)
-                  console.log("PIAN" + oldTweets[i])
+                  console.log(oldTweets[i])
                 }
                 setTweetElement(elements)
            }, [oldTweets])
 
            const scrollUserBar = (direction) => {
             const el = document.getElementById("userbar");
-            direction ? el.scrollLeft += 300 : el.scrollLeft -= 300
+            direction ? el.scrollLeft += 500 : el.scrollLeft -= 500
           }
 
           return (
               <div>
                 <div id="navbar">
-                  <div id="buttons">
-                    <a href="/config">Config</a>
-                  </div>
+                  <img src="static/upbarlogo.png"></img>
+                  <a href="/config" id="buttons">Config</a>
                 </div>
                 <div id="render">
                   <div className="dashboard">
-                    <div className="totalTweets" id="upDisplay">
+                    <div className="totalTweets countDisplay">
                       <div className="totalTweetsnumber">
-                      Tweets {totalTweets}
+                      Tweets: {totalTweets}
                       </div>
                     </div>
-                    <div className="totalTweets" id="downDisplay">
+                    <div className="totalTweets countDisplay">
                       <div className="totalTweetsnumber">
-                      Users {totalUsers}
+                      Users: {totalUsers}
                       </div>
                     </div>
                   </div>
-                  <div id="userbar" >
-                      {userDisplays}
-                  </div>
+                  <div id="parentBar">
                   <div id="scrollButtonsWrap">
                     <button  className="ScrollButton" onClick={() => scrollUserBar(false)}>
                     {"<"}
@@ -383,6 +389,10 @@ async function getTweets() {
                     <button className="ScrollButton" onClick={() => scrollUserBar(true)}>
                     {">"}
                     </button>
+                  </div>
+                  <div id="userbar" >
+                      {userDisplays}
+                  </div>
                   </div>
                 </div>
                   <div id="flex">
