@@ -269,6 +269,7 @@ async function getTweets() {
           const [oldTweets, setOldTweets] = useState([]);
           const [visibility, setVisibility] = useState("hidden");
           const [tweetsElement, setTweetElement] = useState([])
+          const [sidebarDisplay, setSidebarDisplay] = useState("none")
 
           const increaseTotalTweets = (update, dashboard) => {
                 if(totalTweets >= 0) {
@@ -362,6 +363,10 @@ async function getTweets() {
             direction ? el.scrollLeft += 500 : el.scrollLeft -= 500
           }
 
+           const toggleSideBar = () => {
+            sidebarDisplay === "none" ?  setSidebarDisplay("inline") : setSidebarDisplay("none")
+           }
+
           return (
               <div>
                 <div id="navbar">
@@ -397,9 +402,12 @@ async function getTweets() {
                 </div>
                   <div id="flex">
                     <TweetsTimeline tweetsElement={tweetsElement} />
-                    <div id="sidebar">
+                    <div id="sidebar" style={{display: sidebarDisplay}}>
                     {twitterUsers}
                     </div>
+                    <button id="sideBarButton" onClick={() => toggleSideBar()}>
+                     {">"}
+                    </button>
                 </div>
               </div>
             )

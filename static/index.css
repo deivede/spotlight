@@ -78,7 +78,7 @@ a {
   overflow: auto;
   width: 575px;
   height: 600px;
-  border: 1px solid rgb(219,219,219);
+  border: 1px solid rgb(230, 228, 206);
   background-color: rgb(255,255,255);
 }
 
@@ -129,6 +129,11 @@ a {
   scrollbar-width: none;
   position: relative;
   top: 15px;
+}
+
+#sideBarButton {
+  width: 20px;
+  height: 600px;
 }
 
 #parentBar {
