@@ -1,7 +1,7 @@
 import tweepy
-# from src.twitter.keys import *
+from src.twitter.keys import *
 # from keys import *
-# from src.twitter.config import *
+from src.twitter.config import *
 # from config import *
 from src.twitter.heroku_keys import *
 from src.twitter.heroku_config import *
@@ -12,7 +12,7 @@ def updateProfileImage(user):
     friends = rawFriends[0]["twitter"]
 
     for friend in friends:
-        friendPic = friends[friend]['profile_image_url']
+        friendPic = friends[friend]['profile_image_url'][0]
         picRequest = requests.get(friendPic)
 
         if picRequest.status_code == 404:

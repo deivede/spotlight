@@ -39,7 +39,11 @@ def getNewTweets(user, friendId):
     newTweets = []
     oldTweets = []
 
-    newTweets = api.user_timeline(since_id=lastTweet, user_id=id, count=30)
+    if lastTweet is not "":
+        newTweets = api.user_timeline(since_id=lastTweet, user_id=id, count=30)
+    else:
+        newTweets = api.user_timeline(user_id=id, count=30)
+
     oldTweets = api.user_timeline(user_id=id, exclude_replies="true", count=30)
 
     if newTweets:
