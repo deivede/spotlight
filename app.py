@@ -8,7 +8,7 @@ from src.twitter.cli import create_db
 from src.twitter.dbconfig import Config
 from models import db, login_manager
 from src.twitter.oauth import blueprint
-from src.twitter.config import db as mongodb
+from src.twitter.heroku_config import db as mongodb
 
 
 app = Flask(__name__)
